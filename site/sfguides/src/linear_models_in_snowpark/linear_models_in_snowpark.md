@@ -81,7 +81,11 @@ Duration: 3
 **TODO**: Offer advice on why the script might have failed (improper Anaconda setup, improper permissions, etc.)
 
 <!-- ------------------------ -->
-## Your First Regression Analysis
+## Your First Regression Analysis in Snowflake
+Duration: 5
+
+<!-- ------------------------ -->
+## Making Predictions
 Duration: 5
 
 <!-- ------------------------ -->
