@@ -1,182 +1,126 @@
-authors: Luke Merrick
+author: Luke Merrick
 id: linear_models_in_snowpark
-summary: Fit simple linear models in Snowpark
+summary: Quickly apply basic machine learning to your data in Snowflake with linear models
 categories: data-science-&-ml
 environments: web
 status: Published
 feedback link: https://github.com/Snowflake-Labs/sfguides/issues
 tags: Snowpark Python, Machine Learning, Data Science
 
-# Snowflake Guide Template
+# Fit Simple Linear Models in Snowflake
 <!-- ------------------------ -->
 ## Overview 
-Duration: 1
+Duration: 2
+### What are Linear Models?
 
-Please use [this markdown file](https://raw.githubusercontent.com/Snowflake-Labs/sfguides/master/site/sfguides/sample.md) as a template for writing your own Snowflake Quickstarts. This example guide has elements that you will use when writing your own guides, including: code snippet highlighting, downloading files, inserting photos, and more. 
+Linear models constitute a family machine learning algorithms which make predictions of a target variable by taking a linear combination (weighted average) of input variables.
 
-It is important to include on the first page of your guide the following sections: Prerequisites, What you'll learn, What you'll need, and What you'll build. Remember, part of the purpose of a Snowflake Guide is that the reader will have **built** something by the end of the tutorial; this means that actual code needs to be included (not just pseudo-code).
+Linear models are very fast, both in fitting and prediction, require minimal tuning, and are often robust against overfitting. Their simple linear form also enables transparency and interpretability. Though other techniques often deliver accuracy improvements, ML practitioners often begin projects by use linear models both as predictive baselines and for non-predictive analyses into the way that predictive features relate to the target variable.
 
-The rest of this Snowflake Guide explains the steps of writing your own guide. 
+In the statistical literature, linear models are often handled under the theretical umbrella of Generalized Linear Models (GLMs), and statisticians have built up a great deal of theory that lets linear models not just produce predictions, but also enable sophisticated explanations and analyses of data. Additionally, statistical theory also intimately [links linear modeling to Analysis of Variance (ANOVA)](https://en.wikipedia.org/wiki/Analysis_of_variance#Textbook_analysis_using_a_normal_distribution).
+
+#### References
+
+- [Wikipedia: Linear model](https://en.wikipedia.org/wiki/Linear_model)
+- [Wikipedia: Generalized linear model](https://en.wikipedia.org/wiki/Generalized_linear_model)
+- [Wikipedia: Regression analysis](https://en.wikipedia.org/wiki/Regression_analysis)
+- [Wikipedia: Analysis of variance](https://en.wikipedia.org/wiki/Analysis_of_variance)
+- [Scikit-learn: Linear Models](https://scikit-learn.org/stable/modules/linear_model.html)
+
+### What You’ll Learn
+
+This Quickstart will cover
+
+- How Snowpark Python Stored Procedures let you to extend Snowflake with additional statistical and ML functionality.
+- How to perform a basic regression analysis in Snowflake.
+- How Snowflake Stages let you save and reuse models natively in Snowflake.
+
 
 ### Prerequisites
-- Familiarity with Markdown syntax
 
-### What You’ll Learn 
-- how to set the metadata for a guide (category, author, id, etc)
-- how to set the amount of time each slide will take to finish 
-- how to include code snippets 
-- how to hyperlink items 
-- how to include images 
-
-### What You’ll Need 
-- A [GitHub](https://github.com/) Account 
-- [VSCode](https://code.visualstudio.com/download) Installed
-- [NodeJS](https://nodejs.org/en/download/) Installed
-- [GoLang](https://golang.org/doc/install) Installed
-
-### What You’ll Build 
-- A Snowflake Guide
+- A Snowflake account with [Anaconda Packages enabled by ORGADMIN](https://docs.snowflake.com/en/developer-guide/udf/python/udf-python-packages.html#using-third-party-packages-from-anaconda). If you do not have a Snowflake account, you can register for a [free trial account](https://signup.snowflake.com/).
+- A Snowflake account login with ACCOUNTADMIN role. If you have this role in your environment, you may choose to use it. If not, you will need to 1) Register for a free trial, 2) Use a different role that has the ability to create database, schema, tables, stages, tasks, user-defined functions, and stored procedures OR 3) Use an existing database and schema in which you are able to create the mentioned objects.
 
 <!-- ------------------------ -->
-## Metadata Configuration
-Duration: 2
+## Setup 1 of 2: Loading Demo Data
 
-It is important to set the correct metadata for your Snowflake Guide. The metadata contains all the information required for listing and publishing your guide and includes the following:
-
-
-- **summary**: This is a sample Snowflake Guide 
-  - This should be a short, 1 sentence description of your guide. This will be visible on the main landing page. 
-- **id**: sample 
-  - make sure to match the id here with the name of the file, all one word.
-- **categories**: data-science 
-  - You can have multiple categories, but the first one listed is used for the icon.
-- **environments**: web 
-  - `web` is default. If this will be published for a specific event or  conference, include it here.
-- **status**: Published
-  - (`Draft`, `Published`, `Deprecated`, `Hidden`) to indicate the progress and whether the sfguide is ready to be published. `Hidden` implies the sfguide is for restricted use, should be available only by direct URL, and should not appear on the main landing page.
-- **feedback link**: https://github.com/Snowflake-Labs/sfguides/issues
-- **tags**: Getting Started, Data Science, Twitter 
-  - Add relevant  tags to make your sfguide easily found and SEO friendly.
-- **authors**: Daniel Myers 
-  - Indicate the author(s) of this specific sfguide.
-
----
-
-You can see the source metadata for this guide you are reading now, on [the github repo](https://raw.githubusercontent.com/Snowflake-Labs/sfguides/master/site/sfguides/sample.md).
-
-
-<!-- ------------------------ -->
-## Creating a Step
-Duration: 2
-
-A single sfguide consists of multiple steps. These steps are defined in Markdown using Header 2 tag `##`. 
-
-```markdown
-## Step 1 Title
 Duration: 3
 
-All the content for the step goes here.
-
-## Step 2 Title
-Duration: 1
-
-All the content for the step goes here.
-```
-
-To indicate how long each step will take, set the `Duration` under the step title (i.e. `##`) to an integer. The integers refer to minutes. If you set `Duration: 4` then a particular step will take 4 minutes to complete. 
-
-The total sfguide completion time is calculated automatically for you and will be displayed on the landing page. 
-
-<!-- ------------------------ -->
-## Code Snippets, Info Boxes, and Tables
-Duration: 2
-
-Look at the [markdown source for this sfguide](https://raw.githubusercontent.com/Snowflake-Labs/sfguides/master/site/sfguides/sample.md) to see how to use markdown to generate code snippets, info boxes, and download buttons. 
-
-### JavaScript
-```javascript
-{ 
-  key1: "string", 
-  key2: integer,
-  key3: "string"
-}
-```
-
-### Java
-```java
-for (statement 1; statement 2; statement 3) {
-  // code block to be executed
-}
-```
-
-### Info Boxes
-> aside positive
-> 
->  This will appear in a positive info box.
-
-
 > aside negative
-> 
->  This will appear in a negative info box.
+> **Got your own data? You can skip this part!**
+>
+> If you'd like to run linear models only on your own data and feel comfortable adapting some simple SQL queries to use the table(s) of your own choosing, it is safe to skip this data loading step.
 
-### Buttons
-<button>
+**TODO:** Provide a CSV and instructions for loading it into Snowflake. Probably best to copy from another tutorial.
 
-  [This is a download button](link.com)
-</button>
+## Setup 2 of 2: Install Linear Modeling Stored Procedures
 
-### Tables
-<table>
-    <thead>
-        <tr>
-            <th colspan="2"> **The table header** </th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td>The table body</td>
-            <td>with two columns</td>
-        </tr>
-    </tbody>
-</table>
+Duration: 3
 
-### Hyperlinking
-[Youtube - Halsey Playlists](https://www.youtube.com/user/iamhalsey/playlists)
+[Snowpark Python](https://docs.snowflake.com/en/developer-guide/snowpark/python/index) makes it possible to add powerful ML functionality to Snowflake. Other tutorials (**TODO**: link examples) cover the step-by-step details of how to do this, and it is a great idea to check those out if you're curious. All you need to do for this Quickstart is to run the below SQL script by pasting it into a new Snowsight worksheet and running the whole thing with `ctrl` + `shift` + `enter`.
+
+**TODO**: Add script to this github.
+
+[SQL Script](https://snowflake.com)
+
+**TODO**: Add screenshot gif.
+
+> aside positive
+> **Recommnded reading**
+>
+> If you are comfortable with Python, SQL, and Snowpark concepts, you may find it interesting to read the script, as it is pretty well commented and serves as a relatively minimal example of extending Snowflake with Python stored procedures. This is not required to follow along in this tutorial, though.
+
+> aside positive
+> **The code is open-source!**
+>
+> [All Snowflake Quickstarts are licensed under the permissive Apache License 2.0](https://github.com/Snowflake-Labs/sfquickstarts/blob/master/LICENSE), and since the above script is bundled with this Quickstart, it is covered by the same license. This means you are free to alter and use it as you please, though please be aware that it is provided for demonstration, and *it is **not** an official Snowflake product*.
+
+
+### Troubleshooting
+
+**TODO**: Offer advice on why the script might have failed (improper Anaconda setup, improper permissions, etc.)
 
 <!-- ------------------------ -->
-## Images, Videos, and Surveys, and iFrames
+## Your First Regression Analysis
+Duration: 5
+
+<!-- ------------------------ -->
+## Saving Models for Reuse
+Duration: 5
+
+
+<!-- ------------------------ -->
+## Cleaning Up
 Duration: 2
 
-Look at the [markdown source for this guide](https://raw.githubusercontent.com/Snowflake-Labs/sfguides/master/site/sfguides/sample.md) to see how to use markdown to generate these elements. 
+### Dropping the Demo Data
 
-### Images
-![Puppy](assets/SAMPLE.jpg)
+If you loaded the demo data into Snowflake and want to remove it now that you have completed the tutorial, feel free!
 
-### Videos
-Videos from youtube can be directly embedded:
-<video id="KmeiFXrZucE"></video>
+**TODO**: Correct the below snippet.
 
-### Inline Surveys
-<form>
-  <name>How do you rate yourself as a user of Snowflake?</name>
-  <input type="radio" value="Beginner">
-  <input type="radio" value="Intermediate">
-  <input type="radio" value="Advanced">
-</form>
+```sql
+DROP STAGE @linear-model-demo-data-loading;
+DROP SCHEMA linear-model-demo;
+```
 
-### Embed an iframe
-![https://codepen.io/MarioD/embed/Prgeja](https://en.wikipedia.org/wiki/File:Example.jpg "Try Me Publisher")
+### Dropping Saved Models
 
-<!-- ------------------------ -->
-## Conclusion
-Duration: 1
+If you want to wipe out the models we saved in this tutorial, you can do so by deleting the Stage.
 
-At the end of your Snowflake Guide, always have a clear call to action (CTA). This CTA could be a link to the docs pages, links to videos on youtube, a GitHub repo link, etc. 
+**TODO**: Correct the below snippet.
 
-If you want to learn more about Snowflake Guide formatting, checkout the official documentation here: [Formatting Guide](https://github.com/googlecodelabs/tools/blob/master/FORMAT-GUIDE.md)
+```sql
+DROP STAGE @linear-model-demo-saved-models;
+```
+### Removing the Linear Modeling Stored Procedures
 
-### What we've covered
-- creating steps and setting duration
-- adding code snippets
-- embedding images, videos, and surveys
-- importing other markdown files
+If you want to uninstall the linear modeling stored procedures we installed in the beginning, this snippet should have you covered.
+
+**TODO**: Correct the below snippet.
+
+```sql
+DROP PROCEDURE XYZ;
+DROP PROCEDURE XYZ2;
+...
+```
